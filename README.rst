@@ -9,11 +9,11 @@ Why?
 ----
 
 Django ships with a built-in command to handle session cleanup, but it
-starts to have problems when dealing with large session tables. Due to
-its design, it can block writes on the session table for minutes at a
-time, potentially disrupting sites that are served by the sessions. This
-command is designed to perform the same maintenance tasks as the
-built-in command, but to do so without disrupting a site.
+is problematic when dealing with large session tables. Due to its
+design, it can block writes to the session table for minutes at a time,
+potentially disrupting sites that rely on sessions. This command is
+designed to perform the same maintenance tasks as the built-in command
+without disrupting a site by locking the table for a really long time.
 
 Installation
 ------------
@@ -37,10 +37,7 @@ Delete expired sessions in batches of no more than 50000, and sleep for
 Known Issues and Bugs
 ---------------------
 
-- The tool has only been tested thoroughly on a MyISAM MySQL table. I'm
-not aware of any reason that it wouldn't work on other SQL session
-backends, but you should be careful if you're using it in those
-environments.
+- The tool has only been tested thoroughly on a MyISAM MySQL table. I'm not aware of any reason that it wouldn't work on other SQL session backends, but you should be careful if you're using it in those environments.
 
 Author
 ------
