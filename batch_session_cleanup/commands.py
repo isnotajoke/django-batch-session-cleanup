@@ -18,7 +18,7 @@ from django.contrib.sessions.models import Session
 from django.db import connection, transaction
 
 class BatchSessionCleanupCommand(BaseCommand):
-    sql = "DELETE FROM django_session WHERE expire_date < NOW() LIMIT %d;"
+    sql = "DELETE FROM django_session WHERE expire_date < NOW() LIMIT %s;"
 
     help = "Delete expired sessions in batches (alternative to built-in cleanup command)"
 
@@ -69,9 +69,10 @@ class BatchSessionCleanupCommand(BaseCommand):
         deleted_count = self.batch_size
 
         while deleted_count == self.batch_size:
+            self.batch_count += 1
             start_time = datetime.datetime.now()
 
-            deleted_count = cursor.execute(self.sql, [self.batch_size])
+            deleted_count = cursor.execute(self.sql, [int(self.batch_size)])
             transaction.commit_unless_managed()
 
             self.deleted_session_count += deleted_count
@@ -79,8 +80,10 @@ class BatchSessionCleanupCommand(BaseCommand):
             duration = datetime.datetime.now() - start_time
             duration_s = duration.total_seconds()
 
-            self.stdout.write("deleted %d sessions in %d seconds\n" % (deleted_count, duration_s))
-            self.stdout.write("sleeping for %d seconds\n" % self.sleep_time)
+            if self.verbose:
+                self.stdout.write("deleted %d sessions in %d seconds\n" % (deleted_count, duration_s))
+                self.stdout.write("sleeping for %d seconds\n" % self.sleep_time)
+
             time.sleep(self.sleep_time)
 
     def print_results(self):
@@ -92,4 +95,4 @@ class BatchSessionCleanupCommand(BaseCommand):
 
         elapsed_time = datetime.datetime.now() - self.start_time
 
-        self.stdout.write("Total execution time was %d seconds" % elapsed_time.total_seconds())
+        self.stdout.write("Total execution time was %d seconds\n" % elapsed_time.total_seconds())
