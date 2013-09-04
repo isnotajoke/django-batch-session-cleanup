@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='django-batch-session-cleanup',
-    version='0.1.0',
+    version='0.1.1',
     author='Kevan Carstensen',
     author_email='kevan@isnotajoke.com',
     packages=['batch_session_cleanup', 'batch_session_cleanup.management', 'batch_session_cleanup.management.commands'],
