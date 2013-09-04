@@ -51,6 +51,8 @@ class BatchSessionCleanupCommand(BaseCommand):
         # Number of batches run
         self.batch_count            = 0
         self.start_time             = datetime.datetime.now()
+        # list of batch times, for use in reporting at the end
+        self.batch_times            = []
 
         self.purge_sessions()
 
@@ -83,6 +85,7 @@ class BatchSessionCleanupCommand(BaseCommand):
 
             duration = datetime.datetime.now() - start_time
             duration_s = timedelta_to_seconds(duration)
+            self.batch_times.append(duration_s)
 
             if self.verbose:
                 self.stdout.write("deleted %d sessions in %d seconds\n" % (deleted_count, duration_s))
@@ -100,3 +103,5 @@ class BatchSessionCleanupCommand(BaseCommand):
         elapsed_time = datetime.datetime.now() - self.start_time
 
         self.stdout.write("Total execution time was %d seconds\n" % timedelta_to_seconds(elapsed_time))
+        if self.batch_times:
+            self.stdout.write("Average batch time was %.2f seconds\n" % (sum(self.batch_times) / (len(self.batch_times) * 1.0)))
