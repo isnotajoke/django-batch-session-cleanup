@@ -95,6 +95,9 @@ class BatchSessionCleanupCommand(BaseCommand):
 
             if self.verbose:
                 self.stdout.write("deleted %d sessions in %d seconds\n" % (deleted_count, duration_s))
+                self.stdout.write("deleted %d/%d sessions so far (%.2f%)" % (self.deleted_session_count,
+                    self.expired_sesssion_count,
+                    (self.deleted_session_count / (self.expired_session_count * 1.0))))
                 self.stdout.write("sleeping for %d seconds\n" % self.sleep_time)
 
             time.sleep(self.sleep_time)
