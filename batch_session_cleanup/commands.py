@@ -53,6 +53,9 @@ class BatchSessionCleanupCommand(BaseCommand):
         self.start_time             = datetime.datetime.now()
         # list of batch times, for use in reporting at the end
         self.batch_times            = []
+        # total # of expired sessions found at start of process
+        # (used to provide more informative status output)
+        self.expired_session_count = self.count_expired_sessions()
 
         self.purge_sessions()
 
@@ -68,6 +71,9 @@ class BatchSessionCleanupCommand(BaseCommand):
             self.stdout.write("batch-session-cleanup ready\n")
             self.stdout.write("batch size: %d\n" % (self.batch_size))
             self.stdout.write("sleep time: %.2f\n" % (self.sleep_time))
+
+    def count_expired_sessions(self):
+        return Session.objects.filter(expire_date__lte=datetime.datetime.now()).count()
 
     def purge_sessions(self):
         cursor = connection.cursor()
