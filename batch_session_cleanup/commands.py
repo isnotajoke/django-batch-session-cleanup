@@ -17,6 +17,10 @@ from django.core.management.base import BaseCommand
 from django.contrib.sessions.models import Session
 from django.db import connection, transaction
 
+# replaces td.total_seconds() on pre-2.7 platforms
+def timedelta_to_seconds(td):
+    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+
 class BatchSessionCleanupCommand(BaseCommand):
     sql = "DELETE FROM django_session WHERE expire_date < NOW() LIMIT %s;"
 
@@ -78,7 +82,7 @@ class BatchSessionCleanupCommand(BaseCommand):
             self.deleted_session_count += deleted_count
 
             duration = datetime.datetime.now() - start_time
-            duration_s = duration.total_seconds()
+            duration_s = timedelta_to_seconds(duration)
 
             if self.verbose:
                 self.stdout.write("deleted %d sessions in %d seconds\n" % (deleted_count, duration_s))
@@ -95,4 +99,4 @@ class BatchSessionCleanupCommand(BaseCommand):
 
         elapsed_time = datetime.datetime.now() - self.start_time
 
-        self.stdout.write("Total execution time was %d seconds\n" % elapsed_time.total_seconds())
+        self.stdout.write("Total execution time was %d seconds\n" % timedelta_to_seconds(elapsed_time))
